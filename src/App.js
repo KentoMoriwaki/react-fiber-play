@@ -79,17 +79,17 @@ function SierpinskiTriangle({ x, y, s, children }) {
 
   s /= 2;
 
-  return [
+  return <div>
     <SierpinskiTriangle x={x} y={y - (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>,
+    </SierpinskiTriangle>
     <SierpinskiTriangle x={x - s} y={y + (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>,
+    </SierpinskiTriangle>
     <SierpinskiTriangle x={x + s} y={y + (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>,
-  ];
+    </SierpinskiTriangle>
+  </div>;
 }
 SierpinskiTriangle.shouldComponentUpdate = function(oldProps, newProps) {
   var o = oldProps;
@@ -118,9 +118,9 @@ export default class App extends React.Component {
   tick() {
     if (this.state.useTimeSlicing) {
       // Update is time-sliced.
-      unstable_deferredUpdates(() => {
+      // unstable_deferredUpdates(() => {
         this.setState(state => ({ seconds: (state.seconds % 10) + 1 }));
-      });
+      // });
     } else {
       // Update is not time-sliced. Causes demo to stutter.
       this.setState(state => ({ seconds: (state.seconds % 10) + 1 }));
