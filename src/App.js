@@ -79,17 +79,17 @@ function SierpinskiTriangle({ x, y, s, children }) {
 
   s /= 2;
 
-  return <div>
+  return [
     <SierpinskiTriangle x={x} y={y - (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>
+    </SierpinskiTriangle>,
     <SierpinskiTriangle x={x - s} y={y + (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>
+    </SierpinskiTriangle>,
     <SierpinskiTriangle x={x + s} y={y + (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>
-  </div>;
+    </SierpinskiTriangle>,
+  ];
 }
 SierpinskiTriangle.shouldComponentUpdate = function(oldProps, newProps) {
   var o = oldProps;
