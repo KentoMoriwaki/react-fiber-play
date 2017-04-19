@@ -6,8 +6,8 @@
     "react-scripts": "0.9.5"
   },
   "dependencies": {
-    "react": "next",
-    "react-dom": "next"
+    "react": "15.4",
+    "react-dom": "15.4"
   },
   "scripts": {
     "start": "react-scripts start",
