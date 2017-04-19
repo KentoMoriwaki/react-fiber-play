@@ -3,7 +3,15 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-);
+const start = new Date().getTime();
+
+function update() {
+  ReactDOM.render(
+    <App elapsed={new Date().getTime() - start} />,
+    document.getElementById('root')
+  );
+
+  requestAnimationFrame(update);
+}
+
+requestAnimationFrame(update);
