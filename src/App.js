@@ -79,17 +79,17 @@ function SierpinskiTriangle({ x, y, s, children }) {
 
   s /= 2;
 
-  return <div>
+  return [
     <SierpinskiTriangle x={x} y={y - (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>
+    </SierpinskiTriangle>,
     <SierpinskiTriangle x={x - s} y={y + (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>
+    </SierpinskiTriangle>,
     <SierpinskiTriangle x={x + s} y={y + (s / 2)} s={s}>
       {children}
-    </SierpinskiTriangle>
-  </div>;
+    </SierpinskiTriangle>,
+  ];
 }
 SierpinskiTriangle.shouldComponentUpdate = function(oldProps, newProps) {
   var o = oldProps;
@@ -102,19 +102,32 @@ SierpinskiTriangle.shouldComponentUpdate = function(oldProps, newProps) {
   );
 };
 
-class App extends Component {
+export default class App extends React.Component {
   constructor() {
     super();
-    this.state = { seconds: 0 };
+    this.state = {
+      seconds: 0,
+      useTimeSlicing: true,
+    };
     this.tick = this.tick.bind(this);
+    this.onTimeSlicingChange = this.onTimeSlicingChange.bind(this);
   }
   componentDidMount() {
     this.intervalID = setInterval(this.tick, 1000);
   }
   tick() {
-    unstable_deferredUpdates(() =>
-      this.setState(state => ({ seconds: (state.seconds % 10) + 1 }))
-    );
+    if (this.state.useTimeSlicing) {
+      // Update is time-sliced.
+      unstable_deferredUpdates(() => {
+        this.setState(state => ({ seconds: (state.seconds % 10) + 1 }));
+      });
+    } else {
+      // Update is not time-sliced. Causes demo to stutter.
+      this.setState(state => ({ seconds: (state.seconds % 10) + 1 }));
+    }
+  }
+  onTimeSlicingChange(value) {
+    this.setState(() => ({ useTimeSlicing: value }));
   }
   componentWillUnmount() {
     clearInterval(this.intervalID);
@@ -126,15 +139,50 @@ class App extends Component {
     const scale = 1 + (t > 5 ? 10 - t : t) / 10;
     const transform = 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)';
     return (
-      <div style={{ ...containerStyle, transform }}>
+      <div>
         <div>
-          <SierpinskiTriangle x={0} y={0} s={1000}>
-            {this.state.seconds}
-          </SierpinskiTriangle>
+          <h3>Time-slicing</h3>
+          <p>Toggle this and observe the effect</p>
+          <Toggle
+            onLabel="On"
+            offLabel="Off"
+            onChange={this.onTimeSlicingChange}
+            value={this.state.useTimeSlicing}
+          />
+        </div>
+        <div style={{ ...containerStyle, transform }}>
+          <div>
+            <SierpinskiTriangle x={0} y={0} s={1000}>
+              {this.state.seconds}
+            </SierpinskiTriangle>
+          </div>
         </div>
       </div>
     );
   }
 }
 
-export default App;
+class Toggle extends React.Component {
+  constructor(props) {
+    super();
+    this.onChange = this.onChange.bind(this);
+  }
+  onChange(event) {
+    this.props.onChange(event.target.value === 'on');
+  }
+  render() {
+    const value = this.props.value;
+    return (
+      <label onChange={this.onChange}>
+        <label>
+          {this.props.onLabel}
+          <input type="radio" name="value" value="on" checked={value} />
+        </label>
+        <label>
+          {this.props.offLabel}
+          <input type="radio" name="value" value="off" checked={!value} />
+        </label>
+      </label>
+    );
+  }
+}
